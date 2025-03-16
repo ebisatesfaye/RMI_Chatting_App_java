@@ -1,7 +1,7 @@
 //javac serverfilename
 //start rmiregistry
 //java serverfilename
-//
+//ebisa
 
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
