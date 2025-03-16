@@ -1,57 +1,51 @@
+
+
+
+import java.rmi.Naming;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
-import java.rmi.Naming;
-import java.util.Scanner;
 
 public class ChatClient extends UnicastRemoteObject implements ChatClientInterface {
-
     private String name;
     private ChatServerInterface server;
 
+    // Default constructor (if needed)
     protected ChatClient(String name) throws RemoteException {
+        super();
         this.name = name;
     }
-
-    // Callback method invoked by the server.
-    public void receiveMessage(String message) throws RemoteException {
-        System.out.println(message);
+    
+    // NEW: Constructor for GUI integration:
+    // Connects to the RMI server using the provided server IP and registers the client.
+    public ChatClient(String username, String serverIP) throws Exception {
+        super();
+        this.name = username;
+        // Look up the server remote object using the provided IP.
+        server = (ChatServerInterface) Naming.lookup("rmi://" + serverIP + "/ChatServer");
+        // Register this client with the server.
+        server.registerClient(this);
     }
-
-    public void startClient(String serverIP) {
+    
+    // Method to send messages to the server
+    public void sendMessage(String message) {
         try {
-            // Lookup the remote server using the provided IP address.
-            server = (ChatServerInterface) Naming.lookup("rmi://" + serverIP + "/ChatServer");
-            // Register this client with the server.
-            server.registerClient(this);
-            System.out.println("Connected to ChatServer at " + serverIP + ". Start chatting!");
-
-            // Read user input and send messages.
-            Scanner scanner = new Scanner(System.in);
-            while (true) {
-                String message = scanner.nextLine();
-                server.broadcastMessage(name + ": " + message);
-            }
-        } catch (Exception e) {
-            System.err.println("Client exception: " + e);
-            e.printStackTrace();
-        }
-    }
-
-    public static void main(String[] args) {
-        try {
-            // Expect command-line arguments: Client name and server IP.
-            if (args.length < 2) {
-                System.out.println("Usage: java ChatClient <ClientName> <ServerIPAddress>");
-                System.exit(1);
-            }
-            String clientName = args[0];
-            String serverIP = args[1];
-
-            ChatClient client = new ChatClient(clientName);
-            client.startClient(serverIP);
+            server.broadcastMessage(name + ": " + message);
         } catch (RemoteException e) {
-            System.err.println("RemoteException in client: " + e);
             e.printStackTrace();
         }
+    }
+    
+    // This method is called remotely by the server to deliver messages.
+    @Override
+    public void receiveMessage(String message) throws RemoteException {
+        // For debugging, print to the console:
+        System.out.println("Received: " + message);
+        // Update the GUI using a static method from ChatClientGUI.
+        ChatClientGUI.appendMessage(message);
+    }
+    
+    // (Optional main method for non-GUI testing can be removed when using GUI)
+    public static void main(String[] args) {
+        // Not needed when using the GUI version.
     }
 }
