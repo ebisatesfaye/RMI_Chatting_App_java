@@ -31,11 +31,13 @@ public class ChatClientGUI {
         frame.setSize(400, 500);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setLayout(new BorderLayout());
+        frame.setLocationRelativeTo(null);
 
         // Chat messages container
         messageContainer = new JPanel();
         messageContainer.setLayout(new BoxLayout(messageContainer, BoxLayout.Y_AXIS));
-        messageContainer.setBorder(new EmptyBorder(10, 10, 10, 10));
+        messageContainer.setBorder(new EmptyBorder(5, 10, 5, 10));
+        messageContainer.setBackground(new Color(254, 230, 205));
 
         // Scroll pane for messages
         scrollPane = new JScrollPane(messageContainer);
@@ -47,7 +49,26 @@ public class ChatClientGUI {
         inputPanel.setBorder(new EmptyBorder(10, 10, 10, 10));
 
         messageField = new JTextField();
-        JButton sendButton = new JButton("Send");
+        messageField.setBackground(new Color(254, 230, 205));
+        ImageIcon sendIcon = new ImageIcon(ChatClientGUI.class.getResource("send.ico"));
+        Image img = sendIcon.getImage();
+        Image resizedImg = img.getScaledInstance(24, 24, Image.SCALE_SMOOTH);
+        JButton sendButton = new JButton() {
+            @Override
+            protected void paintComponent(Graphics g) {
+                g.drawImage(getBackgroundImage(), 0, 0, getWidth(), getHeight(), this);
+                super.paintComponent(g); // Paint the text and other button components
+            }
+
+            private Image getBackgroundImage() {
+                ImageIcon icon = new ImageIcon("send.ico");
+                return icon.getImage();
+            }
+
+        };
+
+        sendButton.setBorder(BorderFactory.createEmptyBorder());
+        sendButton.setIcon(new ImageIcon(resizedImg));
 
         inputPanel.add(messageField, BorderLayout.CENTER);
         inputPanel.add(sendButton, BorderLayout.EAST);
@@ -71,19 +92,18 @@ public class ChatClientGUI {
     }
 
     // Send message method
-   private static void sendMessage() {
-    String message = messageField.getText().trim();
-    if (!message.isEmpty()) {
-        client.sendMessage(message);  // Send the message to the server
-        messageField.setText(""); // Clear input field
+    private static void sendMessage() {
+        String message = messageField.getText().trim();
+        if (!message.isEmpty()) {
+            client.sendMessage(message); // Send the message to the server
+            messageField.setText(""); // Clear input field
+        }
     }
-}
-
 
     // Append received message to chat UI
     public static void appendMessage(String message, boolean isSender) {
         SwingUtilities.invokeLater(() -> {
-            JPanel messagePanel = new JPanel(new FlowLayout(isSender ? FlowLayout.RIGHT : FlowLayout.LEFT, 5,0));
+            JPanel messagePanel = new JPanel(new FlowLayout(isSender ? FlowLayout.RIGHT : FlowLayout.LEFT, 5, 0));
             messagePanel.setBorder(new EmptyBorder(2, 5, 2, 5));
 
             JLabel messageLabel = new JLabel("<html><p style='width: 250px;'>" + message + "</p></html>");
@@ -91,11 +111,13 @@ public class ChatClientGUI {
             messageLabel.setBorder(BorderFactory.createEmptyBorder(4, 12, 4, 12));
 
             if (isSender) {
-                messageLabel.setBackground(new Color(50, 150, 250)); // Blue for sender
-                messageLabel.setForeground(Color.WHITE);
+                messageLabel.setBackground(new Color(205, 230, 254)); // Blue for sender
+                messageLabel.setForeground(Color.black);
+
             } else {
                 messageLabel.setBackground(new Color(230, 230, 230)); // Gray for others
                 messageLabel.setForeground(Color.BLACK);
+
             }
 
             messagePanel.add(messageLabel);
