@@ -7,7 +7,8 @@ public class ChatClient extends UnicastRemoteObject implements ChatClientInterfa
     private ChatServerInterface server;
 
     // Constructor for GUI integration:
-    // Connects to the RMI server using the provided server IP and registers the client.
+    // Connects to the RMI server using the provided server IP and registers the
+    // client.
     public ChatClient(String username, String serverIP) throws Exception {
         super();
         this.name = username;
@@ -27,7 +28,7 @@ public class ChatClient extends UnicastRemoteObject implements ChatClientInterfa
     }
 
     // This method is called remotely by the server to deliver messages.
-    @Override
+
     public void receiveMessage(String message) throws RemoteException {
         // Update the GUI using a static method from ChatClientGUI.
         boolean isSender = message.startsWith(name + ":");

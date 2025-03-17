@@ -54,7 +54,6 @@ public class ChatClientGUI {
         Image img = sendIcon.getImage();
         Image resizedImg = img.getScaledInstance(24, 24, Image.SCALE_SMOOTH);
         JButton sendButton = new JButton() {
-            @Override
             protected void paintComponent(Graphics g) {
                 g.drawImage(getBackgroundImage(), 0, 0, getWidth(), getHeight(), this);
                 super.paintComponent(g); // Paint the text and other button components
